@@ -1,22 +1,44 @@
-import React, { useCallback, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useCallback, useMemo, useRef, useEffect } from 'react';
+import { Text, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 
-export const DownloadPicture = () => {
-  // ref
+type DownloadPictureProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+export const DownloadPicture: React.FC<DownloadPictureProps> = ({ isOpen, onClose }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  // callbacks
+  // Define snap points for the bottom sheet
+  const snapPoints = useMemo(() => ['25%', '50%', '90%'], []);
+
+  // Handle changes in the bottom sheet state
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
-  }, []);
 
-  // renders
+    // Close the bottom sheet if the user swipes it down
+    if (index === -1) {
+      onClose();
+    }
+  }, [onClose]);
+
+  // Control the bottom sheet based on `isOpen` prop
+  useEffect(() => {
+    if (isOpen) {
+      bottomSheetRef.current?.expand(); // Open the bottom sheet
+    } else {
+      bottomSheetRef.current?.close(); // Close the bottom sheet
+    }
+  }, [isOpen]);
+
   return (
     <GestureHandlerRootView style={styles.container}>
       <BottomSheet
         ref={bottomSheetRef}
+        snapPoints={snapPoints}
+        enablePanDownToClose={true} // Allow swipe-to-close
         onChange={handleSheetChanges}
       >
         <BottomSheetView style={styles.contentContainer}>
@@ -30,7 +52,6 @@ export const DownloadPicture = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'grey',
   },
   contentContainer: {
     flex: 1,
@@ -38,4 +59,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-
