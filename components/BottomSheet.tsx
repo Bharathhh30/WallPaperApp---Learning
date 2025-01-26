@@ -1,51 +1,33 @@
-import React, { useCallback, useMemo, useRef, useEffect } from 'react';
-import { Text, StyleSheet } from 'react-native';
+import React, { useCallback, useMemo, useRef } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 
-type DownloadPictureProps = {
-  isOpen: boolean;
-  onClose: () => void;
-};
-
-export const DownloadPicture: React.FC<DownloadPictureProps> = ({ isOpen, onClose }) => {
+export  const DownloadPicture = ({onClose} : {
+  onClose : () => void
+}) => {
+  // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  // Define snap points for the bottom sheet
-  const snapPoints = useMemo(() => ['25%', '50%', '90%'], []);
-
-  // Handle changes in the bottom sheet state
+  // callbacks
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
+  }, []);
 
-    // Close the bottom sheet if the user swipes it down
-    if (index === -1) {
-      onClose();
-    }
-  }, [onClose]);
-
-  // Control the bottom sheet based on `isOpen` prop
-  useEffect(() => {
-    if (isOpen) {
-      bottomSheetRef.current?.expand(); // Open the bottom sheet
-    } else {
-      bottomSheetRef.current?.close(); // Close the bottom sheet
-    }
-  }, [isOpen]);
-
+  // renders
   return (
-    <GestureHandlerRootView style={styles.container}>
       <BottomSheet
+        onClose={onClose}
         ref={bottomSheetRef}
-        snapPoints={snapPoints}
-        enablePanDownToClose={true} // Allow swipe-to-close
         onChange={handleSheetChanges}
+        snapPoints={["95%"]}
+        enablePanDownToClose = {true}
+        handleIndicatorStyle = {{height:0}} // this will hide the indicator (top lo unna notch )
       >
         <BottomSheetView style={styles.contentContainer}>
           <Text>Awesome 🎉</Text>
         </BottomSheetView>
       </BottomSheet>
-    </GestureHandlerRootView>
   );
 };
 
@@ -59,3 +41,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
